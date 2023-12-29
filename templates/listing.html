@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Property Details - Real Estate{% endblock title %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+
+    .product-container {
+        max-width: 800px;
+        margin: 2em auto;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 2em;
+        border-radius: 8px;
+    }
+
+    .carousel-inner img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .product-info {
+        font-size: 1.2em;
+        margin-top: 20px;
+    }
+
+    .product-info p {
+        margin-bottom: 10px;
+    }
+
+    .info-label {
+        font-weight: bold;
+    }
+
+    .info-value {
+        color: #3498db;
+    }
+</style>
+
+<div class="product-container">
+    {% if listing.images.all %}
+        <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image in listing.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ image.image.url }}" class="d-block w-100" alt="Listing Image">
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    {% else %}
+        <p>No images available.</p>
+    {% endif %}
+
+    <div class="product-info">
+        <p><span class="info-label">Listing Type:</span> <span class="info-value">{{ listing.listing_type }}</span></p>
+        <p><span class="info-label">Property Type:</span> <span class="info-value">{{ listing.property_type }}</span></p>
+        {% if listing.listing_type.listing_type == 'rent' %}
+            <p><span class="info-label">Rent cost per month:</span> <span class="info-value">${{ listing.cost }}</span></p>
+        {% else %}
+            <p><span class="info-label">Cost:</span> <span class="info-value">${{ listing.cost }}</span></p>
+        {% endif %}
+        <p><span class="info-label">Owner:</span> <span class="info-value">{{ listing.owner }}</span></p>
+        <p><span class="info-label">City:</span> <span class="info-value">{{ listing.city }}</span></p>
+        <p><span class="info-label">Region:</span> <span class="info-value">{{ listing.region }}</span></p>
+        <p><span class="info-label">Address:</span> <span class="info-value">{{ listing.address }}</span></p>
+        <p><span class="info-label">Number of Rooms:</span> <span class="info-value">{{ listing.num_rooms }}</span></p>
+        <p><span class="info-label">Number of Bedrooms:</span> <span class="info-value">{{ listing.num_bedroom }}</span></p>
+        <p><span class="info-label">Number of Bathrooms:</span> <span class="info-value">{{ listing.num_bathrooms }}</span></p>
+        <p><span class="info-label">Size:</span> <span class="info-value">{{ listing.size }}m^2</span></p><br>
+
+        <p><span class="info-label">Booking Cost:</span> <span class="info-value">${{ listing.booking_cost }}</span></p>
+        <p>If you cancel the booking, only 70% of your money will be refunded!</p>
+        <p><span class="info-label">Booked:</span> <span class="info-value">{{ listing.booked }}</span></p>
+    </div>
+
+    {% if listing.owner != current_user %}
+        {% if listing.is_active %}
+            <form method="post" action="{% url 'book_listing' listing.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Book Now</button>
+            </form>
+
+        {% elif booked_listing and booked_listing.user == current_user %}
+            <form method="post" action="{% url 'cancel_booking' booked_listing.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning">Cancel the booking</button>
+            </form>
+
+        {% elif not booked_listing %}
+            <button disabled type="submit" class="btn">Already booked!</button>
+        {% endif %}
+    {% else %}
+        {% if listing.is_active %}
+            <form method="post" action="{% url 'toggle_listing' id=listing.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="deactivate" class="btn btn-danger">Deactivate</button>
+            </form>
+        {% elif not listing.is_active and not listing.booked %}
+            <form method="post" action="{% url 'toggle_listing' id=listing.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="activate" class="btn btn-primary">Activate</button>
+            </form>
+        {% endif %}
+
+        <form method="post" action="{% url 'delete_listing' id=listing.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock content %}

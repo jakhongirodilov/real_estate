@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin: 10px 0;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .button-container {
+        display: flex;
+        gap: 10px; /* Adjust the gap as needed */
+    }
+
+    button {
+        padding: 10px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+        outline: none;
+    }
+
+    button.deactivate {
+        background-color: #e74c3c;
+        color: #fff;
+    }
+
+    button.activate {
+        background-color: #3498db;
+        color: #fff;
+    }
+
+    button.booked {
+        background-color: #95a5a6;
+        color: #fff;
+    }
+
+    button.delete {
+        background-color: #e74c3c;
+        color: #fff;
+    }
+
+    p.empty-message {
+        text-align: center;
+        margin-top: 30px;
+    }
+</style>
+
+<ul>
+    {% for listing in listings %}
+        <li>
+            <a href="{% url 'listing' id=listing.id %}">
+                {{ listing }}
+            </a>
+
+            <div class="button-container">
+                {% if listing.is_active %}
+                    <form method="post" action="{% url 'toggle_listing' id=listing.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="deactivate" class="deactivate">Deactivate</button>
+                    </form>
+                {% elif not listing.is_active %}
+                    {% if not listing.booked %}
+                        <form method="post" action="{% url 'toggle_listing' id=listing.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="activate" class="activate">Activate</button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{% url 'toggle_listing' id=listing.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" disabled name="action" value="activate" class="booked">Booked!</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+
+                <form method="post" action="{% url 'delete_listing' id=listing.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="delete" class="delete">Delete</button>
+                </form>
+            </div>
+        </li>
+    {% empty %}
+        <p class="empty-message">You have not posted any listings yet...</p>
+    {% endfor %}
+</ul>
+{% endblock content %}
