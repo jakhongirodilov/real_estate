@@ -1,8 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}User Profile{% endblock title %}
 
 {% block content %}
-<h1>Hello, {{user.username}}</h1>
-<h3>Balance: {{user.balance}}$</h3>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            margin-top: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+    </style>
+
+    <div class="profile-container">
+        <h1>User Profile</h1>
+        <div class="user-info">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Balance:</strong> ${{ user.balance }}</p>
+        </div>
+    </div>
 {% endblock content %}
