@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth import logout, login
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from .forms import CustomUserCreationForm
 
 
@@ -21,9 +21,7 @@ def logout_view(request):
 
 def profile(request):
     user = request.user
-
     context ={
         'user': user
     }
-
     return render(request, 'profile.html', context)
