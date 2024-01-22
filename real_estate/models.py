@@ -25,12 +25,14 @@ class Listing(models.Model):
 
     def __str__(self) -> str:
         return f"{self.num_rooms} room {self.property_type} in {self.city}"
+    
 
 class ListingType(models.Model):
     listing_type = models.CharField(max_length=50)
 
     def __str__(self) -> str:
         return self.listing_type
+    
 
 class PropertyType(models.Model):
     property_type = models.CharField(max_length=50)
@@ -43,12 +45,14 @@ def get_image_filename(instance, filename):
     id = instance.listing.id
     return "post_images/%s" % (id)
 
+
 class ListingImage(models.Model):
     listing = models.ForeignKey(Listing, default=None, on_delete=models.CASCADE, related_name='images')
     image = models.FileField(upload_to=get_image_filename, verbose_name='Image')
 
     def __str__(self):
         return f"Image for {self.listing}"
+    
 
 class Booking(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
